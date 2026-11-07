@@ -98,6 +98,14 @@
                 :label="$t('recipe.substitutions')"
               />
             </v-row>
+            <v-row no-gutters>
+              <v-switch
+                v-model="preferences.useTableView"
+                hide-details
+                color="primary"
+                :label="$t('recipe.table-view')"
+              />
+            </v-row>
           </v-col>
         </v-row>
       </v-container>
