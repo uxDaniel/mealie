@@ -1,6 +1,7 @@
 <template>
   <div>
     <RecipeIngredients
+      v-if="!hideIngredients"
       :value="recipe.recipeIngredient"
       :scale="scale"
       :is-cook-mode="isCookMode"
@@ -53,10 +54,12 @@ interface Props {
   scale: number;
   isCookMode?: boolean;
   ingredientStorageKey?: string;
+  hideIngredients?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
   isCookMode: false,
   ingredientStorageKey: undefined,
+  hideIngredients: false,
 });
 
 const { isOwnGroup } = useLoggedInState();

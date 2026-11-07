@@ -59,9 +59,47 @@
           <div>
             <RecipePageIngredientEditor v-if="isEditForm" v-model="recipe" />
           </div>
-          <div>
+          <div class="d-flex align-center justify-space-between flex-wrap ga-2">
             <RecipePageScale v-model="scale" :recipe="recipe" />
+            <div v-if="isViewMode" class="d-flex align-center ga-2">
+              <BaseButton
+                v-if="showTable"
+                minor
+                cancel
+                color="primary"
+                @click="toggleCookMode()"
+              >
+                <template #icon>
+                  {{ $globals.icons.primary }}
+                </template>
+                {{ $t("recipe.cook-mode") }}
+              </BaseButton>
+              <v-btn-toggle
+                v-model="layoutPreferences.layout"
+                mandatory="force"
+                density="compact"
+                variant="outlined"
+                divided
+              >
+                <v-btn
+                  :value="RecipeLayout.list"
+                  :icon="$globals.icons.formatListBulleted"
+                  :aria-label="$t('recipe.list-view')"
+                />
+                <v-btn
+                  :value="RecipeLayout.table"
+                  :icon="$globals.icons.table"
+                  :aria-label="$t('recipe.table-view')"
+                />
+              </v-btn-toggle>
+            </div>
           </div>
+          <RecipeTableView
+            v-if="showTable"
+            :recipe="displayedRecipe"
+            :scale="scale"
+            class="mb-4"
+          />
 
           <!--
             This section contains the 2 column layout for the recipe steps and other content.
@@ -82,6 +120,7 @@
                 :recipe="displayedRecipe"
                 :scale="scale"
                 :ingredient-storage-key="ingredientStorageKey"
+                :hide-ingredients="showTable"
                 class="pr-2"
               />
               <RecipePageOrganizers v-if="$vuetify.display.mdAndUp" v-model="recipe" class="pr-2" @item-selected="chipClicked" />
@@ -93,6 +132,7 @@
             <v-col cols="12" sm="12" :md="8 + (isCookMode ? 1 : 0) * 4">
               <v-form ref="instructionForm" @submit.prevent>
                 <RecipePageInstructions
+                  v-if="!showTable"
                   v-model="recipe.recipeInstructions"
                   v-model:assets="recipe.assets"
                   :recipe="displayedRecipe"
@@ -239,6 +279,8 @@ import RecipePageScale from "./RecipePageParts/RecipePageScale.vue";
 import RecipePageInfoEditor from "./RecipePageParts/RecipePageInfoEditor.vue";
 import RecipePageComments from "./RecipePageParts/RecipePageComments.vue";
 import RecipePrintContainer from "~/components/Domain/Recipe/RecipePrintContainer.vue";
+import RecipeTableView from "~/components/Domain/Recipe/RecipeTableView.vue";
+import { RecipeLayout, useUserRecipeLayoutPreferences } from "~/composables/use-users/preferences";
 import {
   clearPageState,
   PageMode,
@@ -281,6 +323,10 @@ const { pageMode, setMode, isEditForm, isEditJSON, isCookMode, isEditMode, isPar
   = usePageState(recipe.value.slug);
 const { deactivateNavigationWarning } = useNavigationWarning();
 const scale = ref(1);
+
+const layoutPreferences = useUserRecipeLayoutPreferences();
+const isViewMode = computed(() => pageMode.value === PageMode.VIEW);
+const showTable = computed(() => isViewMode.value && layoutPreferences.value.layout === RecipeLayout.table);
 
 const { unitSystem } = useUnitSystem();
 const { convertIngredient } = useUnitConversion();

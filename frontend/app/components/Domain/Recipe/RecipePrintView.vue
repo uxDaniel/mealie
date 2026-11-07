@@ -63,8 +63,20 @@
       </v-container>
     </section>
 
+    <!-- Table: replaces the ingredients and instructions, and carries the full step text -->
+    <section v-if="preferences.useTableView">
+      <v-card-title class="headline pl-0">
+        {{ $t("recipe.instructions") }}
+      </v-card-title>
+      <RecipeTableView
+        :recipe="recipe"
+        :scale="scale"
+        full-text
+      />
+    </section>
+
     <!-- Ingredients -->
-    <section>
+    <section v-if="!preferences.useTableView">
       <v-card-title class="headline pl-0">
         {{ $t("recipe.ingredients") }}
       </v-card-title>
@@ -105,7 +117,7 @@
     </section>
 
     <!-- Instructions -->
-    <section>
+    <section v-if="!preferences.useTableView">
       <div
         v-for="(instructionSection, sectionIndex) in instructionSections"
         :key="`instruction-section-${sectionIndex}`"
@@ -223,6 +235,7 @@
 
 <script setup lang="ts">
 import DOMPurify from "dompurify";
+import RecipeTableView from "~/components/Domain/Recipe/RecipeTableView.vue";
 import RecipeTimeCard from "~/components/Domain/Recipe/RecipeTimeCard.vue";
 import { useStaticRoutes } from "~/composables/api";
 import type { Recipe, RecipeIngredient, RecipeStep } from "~/lib/api/types/recipe";

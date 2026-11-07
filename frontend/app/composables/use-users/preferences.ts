@@ -11,6 +11,7 @@ export interface UserPrintPreferences {
   showNutrition: boolean;
   showSubstitutions: boolean;
   expandChildRecipes: boolean;
+  useTableView: boolean;
 }
 
 export interface UserSearchQuery {
@@ -21,6 +22,15 @@ export enum ImagePosition {
   hidden = "hidden",
   left = "left",
   right = "right",
+}
+
+export enum RecipeLayout {
+  list = "list",
+  table = "table",
+}
+
+export interface UserRecipeLayoutPreferences {
+  layout: RecipeLayout;
 }
 
 export interface UserMealPlanPreferences {
@@ -108,6 +118,19 @@ export function useUserPrintPreferences(): Ref<UserPrintPreferences> {
       showNutrition: false,
       showSubstitutions: true,
       expandChildRecipes: false,
+      useTableView: false,
+    },
+    { mergeDefaults: true },
+  );
+
+  return fromStorage;
+}
+
+export function useUserRecipeLayoutPreferences(): Ref<UserRecipeLayoutPreferences> {
+  const fromStorage = useLocalStorage(
+    "recipe-layout-preferences",
+    {
+      layout: RecipeLayout.list,
     },
     { mergeDefaults: true },
   );
